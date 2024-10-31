@@ -7,7 +7,7 @@ defmodule WhatCouldItCost.Scrape do
   @impl Crawly.Spider
   def init() do
     urls =
-      Enum.map(1..10, fn i ->
+      Enum.map(1..100, fn i ->
         "https://www.trolley.co.uk/grocery-price-index/?ajax_product=1&page=#{i}"
       end)
       |> IO.inspect(label: "start_urls")
@@ -30,7 +30,7 @@ defmodule WhatCouldItCost.Scrape do
           name: Floki.find(x, "._title") |> Floki.text() |> String.trim(" "),
           brand: Floki.find(x, "._title > span") |> Floki.text() |> String.trim(" "),
           price: Floki.find(x, "td:nth-child(4)") |> Floki.text() |> String.trim(" ") |> String.trim("£"),
-          img: Floki.find(x, "._product-img > img") |> Floki.attribute("src")
+          img: Floki.find(x, "._product-img > img") |> Floki.attribute("src") |> Enum.at(0)
         }
       end)
 
