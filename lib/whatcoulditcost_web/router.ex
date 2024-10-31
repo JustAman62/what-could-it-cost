@@ -1,5 +1,6 @@
 defmodule WhatCouldItCostWeb.Router do
   use WhatCouldItCostWeb, :router
+  import Phoenix.LiveView.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -18,6 +19,7 @@ defmodule WhatCouldItCostWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/play", PlayLive
   end
 
   # Other scopes may use custom stacks.
