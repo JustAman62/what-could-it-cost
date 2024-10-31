@@ -1,18 +1,23 @@
-# WhatCouldItCost
+# What Could It Cost?
 
-To start your Phoenix server:
+What Could It Cost? is a simple web game where you try to guess how much a random grocery store product costs. Think "The Price is Right" vibes.
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## Data
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Product data is scraped from [trolley.co.uk](https://www.trolley.co.uk/), which compares prices for common grocery items between UK supermarkets. We take the average price of all the supermarkets as our price you are trying to guess.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+## Commands
 
-## Learn more
+```sh
+# Download deps
+mix deps.get
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+# Download & setup deps (first time)
+mix setup
+
+# Start the server
+mix phx.server
+
+# Scrape data to ./data dir
+iex -S mix run -e "Crawly.Engine.start_spider(WhatCouldItCost.Scrape)"
+```

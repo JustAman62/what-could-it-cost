@@ -8,7 +8,7 @@ defmodule WhatCouldItCostWeb.Endpoint do
     store: :cookie,
     key: "_whatcoulditcost_key",
     signing_salt: "wz3vQ531",
-    same_site: "Lax"
+    same_site: "Strict"
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
