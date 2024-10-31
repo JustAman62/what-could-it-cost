@@ -2,7 +2,7 @@ defmodule WhatCouldItCost.Scrape do
   use Crawly.Spider
 
   @impl Crawly.Spider
-  def base_url(), do: "https://www.trolley.co.uk//"
+  def base_url(), do: "https://www.trolley.co.uk/"
 
   @impl Crawly.Spider
   def init() do
@@ -29,7 +29,11 @@ defmodule WhatCouldItCost.Scrape do
         %{
           name: Floki.find(x, "._title") |> Floki.text() |> String.trim(" "),
           brand: Floki.find(x, "._title > span") |> Floki.text() |> String.trim(" "),
-          price: Floki.find(x, "td:nth-child(4)") |> Floki.text() |> String.trim(" ") |> String.trim("£"),
+          price:
+            Floki.find(x, "td:nth-child(4)")
+            |> Floki.text()
+            |> String.trim(" ")
+            |> String.trim("£"),
           img: Floki.find(x, "._product-img > img") |> Floki.attribute("src") |> Enum.at(0)
         }
       end)
