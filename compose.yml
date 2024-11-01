@@ -10,3 +10,5 @@ services:
       SECRET_KEY_BASE: nfCw6Eh6F5u9KBZlyTymQ9GsW/Wckyvn+FGCpuhiXDErEnH6klbvEb8jw9d1zccB
       PHX_HOST: localhost
       PORT: 4000
+    volumes:
+      - "priv/data:/app/lib/whatcoulditcost-0.1.0/priv/data:rw"
