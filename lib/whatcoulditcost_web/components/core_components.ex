@@ -673,4 +673,71 @@ defmodule WhatCouldItCostWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc """
+  Copy to clipboard button for the supplied content
+  """
+
+  attr :id, :string, required: true
+  attr :content, :string, required: true
+
+  def copy_button(assigns) do
+    ~H"""
+    <pre id={"#{@id}-value"} class="hidden">
+      <%= @content %>
+    </pre>
+    <.button id={@id} phx-click={JS.dispatch("phx:copy", to: "##{@id}-value")} class="flex gap-2">
+      <svg
+        class="w-6 h-6 text-gray-800 dark:text-white"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
+          clip-rule="evenodd"
+        />
+        <path
+          fill-rule="evenodd"
+          d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+      <span class="grow text-center">Copy Results</span>
+    </.button>
+    """
+  end
+
+  @doc """
+  Open the native share sheet with the provided content
+  """
+
+  attr :id, :string, required: true
+  attr :content, :string, required: true
+
+  def share_button(assigns) do
+    ~H"""
+    <pre id={"#{@id}-value"} class="hidden">
+      <%= @content %>
+    </pre>
+    <.button id={@id} phx-click={JS.dispatch("phx:share", to: "##{@id}-value")} class="flex gap-2">
+      <svg
+        class="w-6 h-6 text-gray-800 dark:text-white"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path d="M17.5 3a3.5 3.5 0 0 0-3.456 4.06L8.143 9.704a3.5 3.5 0 1 0-.01 4.6l5.91 2.65a3.5 3.5 0 1 0 .863-1.805l-5.94-2.662a3.53 3.53 0 0 0 .002-.961l5.948-2.667A3.5 3.5 0 1 0 17.5 3Z" />
+      </svg>
+      Share Results
+    </.button>
+    """
+  end
 end

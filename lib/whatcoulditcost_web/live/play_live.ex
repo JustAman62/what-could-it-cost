@@ -37,10 +37,30 @@ defmodule WhatCouldItCostWeb.PlayLive do
           step="0.01"
           max="1000.0"
           value={@form[:price].value}
+          autofocus
           class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 ps-10"
         />
       </div>
-      <.button type="submit" class="bg-brand">Submit</.button>
+      <.button type="submit" class="bg-brand flex">
+        <svg
+          class="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 12H5m14 0-4 4m4-4-4-4"
+          />
+        </svg>
+        <span class="grow text-center">Submit</span>
+      </.button>
     </.form>
     """
   end
@@ -78,7 +98,31 @@ defmodule WhatCouldItCostWeb.PlayLive do
     <p class="font-semibold text-sm mt-4">Total Score</p>
     <p class="font-bold text-xl"><%= @score %></p>
 
-    <.button class="bg-brand mt-4" phx-click="next_round">Next</.button>
+    <.button
+      class="bg-brand mt-4 flex w-52"
+      phx-click="next_round"
+      phx-window-keydown="next_round"
+      phx-key="Enter"
+    >
+      <svg
+        class="w-6 h-6 text-gray-800 dark:text-white"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 12H5m14 0-4 4m4-4-4-4"
+        />
+      </svg>
+      <span class="grow text-center">Next</span>
+    </.button>
     """
   end
 
@@ -91,7 +135,34 @@ defmodule WhatCouldItCostWeb.PlayLive do
     <p class="font-semibold text-sm mt-4">Your Score</p>
     <p class="font-bold text-xl"><%= @score %> / 5000</p>
 
-    <.button class="bg-brand mt-4" phx-click="play_again">Play Again</.button>
+    <p><%= @results_text %></p>
+
+    <h2 class="font-semibold text-lg mt-4">Share</h2>
+
+    <div class="flex flex-col gap-2">
+      <.copy_button id="copy-button" content={@results_text} />
+      <.share_button id="share-button" content={@results_text} />
+      <.button class="bg-brand mt-4 flex" phx-click="play_again">
+        <svg
+          class="w-6 h-6 text-gray-800 dark:text-white"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13.484 9.166 15 7h5m0 0-3-3m3 3-3 3M4 17h4l1.577-2.253M4 7h4l7 10h5m0 0-3 3m3-3-3-3"
+          />
+        </svg>
+        <span class="grow text-center">Play Again</span>
+      </.button>
+    </div>
     """
   end
 
@@ -215,7 +286,18 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
       {:noreply, socket}
     else
+      results_text = """
+      What Could It Cost?
+
+      #{emoji_progress_bar(socket.assigns.score, 5000)}
+      #{socket.assigns.score}/5000
+
+      Could you do better?
+      Try for yourself: https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
+      """
+
       socket = assign(socket, :stage, :finished)
+      socket = assign(socket, :results_text, results_text)
       {:noreply, socket}
     end
   end
@@ -223,5 +305,12 @@ defmodule WhatCouldItCostWeb.PlayLive do
   def handle_event("play_again", _params, socket) do
     seed = :rand.uniform(9000) + 1000
     {:noreply, redirect(socket, to: "/play/#{seed}")}
+  end
+
+  defp emoji_progress_bar(score, total_score) do
+    green = round(score / total_score * 5)
+    red = round((total_score - score) / total_score * 5)
+
+    "#{String.duplicate("🟩", green)}#{String.duplicate("🟥", red)}"
   end
 end
