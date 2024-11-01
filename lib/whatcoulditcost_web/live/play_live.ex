@@ -6,8 +6,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
     <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
     <img src={@product["img"]} class="h-52 md:h-64 w-auto rounded-xl shadow-lg p-4 bg-white" />
     <div class="my-4 flex flex-col items-center">
-      <h1 class="text-3xl font-semibold"><%= @product["brand"] %></h1>
-      <h2 class="text-xl"><%= @product["name"] %></h2>
+      <h1 class="text-2xl md:text-3xl font-semibold"><%= @product["brand"] %></h1>
+      <h2 class="text-lg md:text-xl"><%= @product["name"] %></h2>
     </div>
     <.form for={@form} phx-submit="submit_answer" class="flex flex-col items-stretch">
       <.label for="price">Price</.label>
@@ -70,8 +70,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
     <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
     <img src={@product["img"]} class="h-52 md:h-64 w-auto rounded-xl shadow-lg p-4 bg-white" />
     <div class="my-4 flex flex-col items-center">
-      <h1 class="text-3xl font-semibold"><%= @product["brand"] %></h1>
-      <h2 class="text-xl"><%= @product["name"] %></h2>
+      <h1 class="text-2xl md:text-3xl font-semibold"><%= @product["brand"] %></h1>
+      <h2 class="text-lg md:text-xl"><%= @product["name"] %></h2>
     </div>
 
     <div class="w-64 md:w-96 bg-gray-200 rounded-full h-2.5">
@@ -79,24 +79,24 @@ defmodule WhatCouldItCostWeb.PlayLive do
       </div>
     </div>
 
-    <p class="font-semibold text-sm mt-4">Round Score</p>
-    <p class="font-bold text-xl"><%= @last_score %> / 1000</p>
-
     <div class="flex w-64 md:w-96 mt-2">
       <div class="flex flex-col grow items-center text-center">
         <p class="font-semibold text-sm">Your Answer</p>
         <p class="font-bold text-xl">£<%= :erlang.float_to_binary(@last_answer, decimals: 2) %></p>
+
+        <p class="font-semibold text-sm mt-4">Round Score</p>
+        <p class="font-bold text-xl"><%= @last_score %> / 1000</p>
       </div>
       <div class="flex flex-col grow items-center text-center">
         <p class="font-semibold text-sm">Actual</p>
         <p class="font-bold text-xl">
           £<%= :erlang.float_to_binary(String.to_float(@product["price"]), decimals: 2) %>
         </p>
+
+        <p class="font-semibold text-sm mt-4">Total Score</p>
+        <p class="font-bold text-xl"><%= @score %></p>
       </div>
     </div>
-
-    <p class="font-semibold text-sm mt-4">Total Score</p>
-    <p class="font-bold text-xl"><%= @score %></p>
 
     <.button
       class="bg-brand mt-4 flex w-52"
