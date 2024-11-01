@@ -72,7 +72,7 @@ defmodule WhatCouldItCostWeb.HomeLive do
             />
           </svg>
 
-          <span>Created by Aman Dhoot</span>
+          <span>More Games by Aman Dhoot</span>
         </a>
       </div>
     </div>
