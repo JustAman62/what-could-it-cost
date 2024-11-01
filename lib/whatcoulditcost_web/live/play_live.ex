@@ -4,12 +4,13 @@ defmodule WhatCouldItCostWeb.PlayLive do
   defp render_waiting_for_answer(assigns) do
     ~H"""
     <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
-    <img src={@product["img"]} class="h-64 w-auto rounded-xl shadow-lg" />
+    <img src={@product["img"]} class="h-52 md:h-64 w-auto rounded-xl shadow-lg p-4 bg-white" />
     <div class="my-4 flex flex-col items-center">
       <h1 class="text-3xl font-semibold"><%= @product["brand"] %></h1>
       <h2 class="text-xl"><%= @product["name"] %></h2>
     </div>
-    <.form for={@form} phx-submit="submit_answer" class="flex flex-col items-stretch gap-2">
+    <.form for={@form} phx-submit="submit_answer" class="flex flex-col items-stretch">
+      <.label for="price">Price</.label>
       <div class="relative mb-6">
         <div class="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
           <svg
@@ -28,14 +29,13 @@ defmodule WhatCouldItCostWeb.PlayLive do
             />
           </svg>
         </div>
-        <%!-- <.label for="price">Price</.label> --%>
         <input
-          type="text"
+          type="number"
           name="price"
           id="price"
-          inputmode="numeric"
-          pattern="[0-9]+(|\.[0-9]{2})"
+          type="number"
           step="0.01"
+          max="1000.0"
           value={@form[:price].value}
           class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 ps-10"
         />
@@ -48,20 +48,21 @@ defmodule WhatCouldItCostWeb.PlayLive do
   defp render_review_score(assigns) do
     ~H"""
     <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
-    <img src={@product["img"]} class="h-64 w-auto rounded-xl shadow-lg" />
+    <img src={@product["img"]} class="h-52 md:h-64 w-auto rounded-xl shadow-lg p-4 bg-white" />
     <div class="my-4 flex flex-col items-center">
       <h1 class="text-3xl font-semibold"><%= @product["brand"] %></h1>
       <h2 class="text-xl"><%= @product["name"] %></h2>
     </div>
 
-    <div class="w-96 bg-gray-200 rounded-full h-2.5">
-      <div class="bg-green-600 h-2.5 rounded-full" style={"width: #{(@last_score/1000) * 100}%"}></div>
+    <div class="w-64 md:w-96 bg-gray-200 rounded-full h-2.5">
+      <div class="bg-green-600 h-2.5 rounded-full" style={"width: #{(@last_score/1000) * 100}%"}>
+      </div>
     </div>
 
     <p class="font-semibold text-sm mt-4">Round Score</p>
     <p class="font-bold text-xl"><%= @last_score %> / 1000</p>
 
-    <div class="flex w-96 mt-2">
+    <div class="flex w-64 md:w-96 mt-2">
       <div class="flex flex-col grow items-center text-center">
         <p class="font-semibold text-sm">Your Answer</p>
         <p class="font-bold text-xl">£<%= :erlang.float_to_binary(@last_answer, decimals: 2) %></p>
@@ -83,7 +84,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
   defp render_finished(assigns) do
     ~H"""
-    <div class="w-96 bg-gray-200 rounded-full h-2.5 mt-4">
+    <div class="w-64 md:w-96 bg-gray-200 rounded-full h-2.5 mt-4">
       <div class="bg-green-600 h-2.5 rounded-full" style={"width: #{@score/50}%"}></div>
     </div>
 
@@ -110,7 +111,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
     assigns = assign(assigns, :inner, inner)
 
     ~H"""
-    <div class="flex flex-col items-center ring-1 ring-black rounded-xl px-4 pt-2 pb-4 text-center">
+    <div class="flex flex-col items-center md:ring-1 ring-black rounded-xl md:px-4 md:pt-2 md:pb-4 text-center">
       <%= @inner %>
     </div>
 

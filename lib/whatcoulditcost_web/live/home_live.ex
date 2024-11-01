@@ -4,7 +4,7 @@ defmodule WhatCouldItCostWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <.flash_group flash={@flash} />
-    <div class="flex flex-col h-svh bg-yellow-300 items-center justify-center">
+    <div class="flex flex-col h-svh bg-yellow-300 items-center justify-center text-center px-4">
       <h1 class="text-4xl font-bold">What Could It Cost?</h1>
 
       <p class="mt-16 font-semibold text-xl">
@@ -17,7 +17,7 @@ defmodule WhatCouldItCostWeb.HomeLive do
       <.form for={@form} phx-submit="start_game" class="flex flex-col items-stretch gap-2 mt-16">
         <div>
           <.label>Seed</.label>
-          <.input type="text" inputmode="numeric" pattern="[0-9\.]*" field={@form[:seed]} />
+          <.input type="text" inputmode="numeric" pattern="[0-9]{4}" field={@form[:seed]} />
         </div>
         <.button type="submit">Play</.button>
       </.form>
