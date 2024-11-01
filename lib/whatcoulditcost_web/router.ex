@@ -18,7 +18,7 @@ defmodule WhatCouldItCostWeb.Router do
   scope "/", WhatCouldItCostWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", HomeLive, :home
     live "/play", PlayLive
   end
 
