@@ -135,8 +135,6 @@ defmodule WhatCouldItCostWeb.PlayLive do
     <p class="font-semibold text-sm mt-4">Your Score</p>
     <p class="font-bold text-xl"><%= @score %> / 5000</p>
 
-    <p><%= @results_text %></p>
-
     <h2 class="font-semibold text-lg mt-4">Share</h2>
 
     <div class="flex flex-col gap-2">
@@ -186,12 +184,14 @@ defmodule WhatCouldItCostWeb.PlayLive do
       <%= @inner %>
     </div>
 
-    <div class="text-center mt-8">
-      <p class="mt-2 text-xs">
-        Your Random Seed: <span class="font-bold font-mono"><%= @initial_seed %></span>
-      </p>
-      <p class="text-xs">Share this seed with your friends to play the same quiz.</p>
-    </div>
+    <%= if @initial_seed != "daily" do %>
+      <div class="text-center mt-8">
+        <p class="mt-2 text-xs">
+          Your Random Seed: <span class="font-bold font-mono"><%= @initial_seed %></span>
+        </p>
+        <p class="text-xs">Share this seed with your friends to play the same quiz.</p>
+      </div>
+    <% end %>
     """
   end
 
@@ -212,13 +212,19 @@ defmodule WhatCouldItCostWeb.PlayLive do
   end
 
   def mount(%{"initial_seed" => initial_seed}, _session, socket) do
-    case Integer.parse(initial_seed) do
-      {initial_seed, ""} when initial_seed >= 1000 and initial_seed < 10000 ->
+    initial_seed_val =
+      case initial_seed do
+        "daily" -> "#{Date.diff(NaiveDateTime.utc_now(), ~D[2024-10-01]) + 1000}"
+        _ -> initial_seed
+      end
+
+    case Integer.parse(initial_seed_val) do
+      {initial_seed_val, ""} when initial_seed_val >= 1000 and initial_seed_val < 10000 ->
         all_products =
           File.stream!(Path.join(:code.priv_dir(:whatcoulditcost), "data/product_data.jl"))
           |> Enum.map(fn x -> Jason.decode!(x) end)
 
-        initial_product_index = rem(initial_seed, Enum.count(all_products))
+        initial_product_index = rem(initial_seed_val, Enum.count(all_products))
         product_data = Enum.at(all_products, initial_product_index)
 
         {:ok,
@@ -226,7 +232,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
            :stage => :waiting_for_answer,
            :index => 0,
            :initial_seed => initial_seed,
-           :seed => {:exsss, [1 | initial_seed]},
+           :seed => {:exsss, [1 | initial_seed_val]},
            :product => product_data,
            :score => 0,
            :last_score => 0,
@@ -258,7 +264,10 @@ defmodule WhatCouldItCostWeb.PlayLive do
         socket = assign(socket, :last_answer, price)
         socket = assign(socket, :last_score, round_score)
         socket = update(socket, :score, &(&1 + round_score))
-        socket = update(socket, :results_text, &(&1 <> "\n#{emoji_progress_bar(round_score, 1000)}"))
+
+        socket =
+          update(socket, :results_text, &(&1 <> "\n#{emoji_progress_bar(round_score, 1000)}"))
+
         socket = assign(socket, :stage, :review_score)
 
         {:noreply, socket}

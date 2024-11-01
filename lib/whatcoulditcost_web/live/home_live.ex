@@ -14,12 +14,18 @@ defmodule WhatCouldItCostWeb.HomeLive do
         Play our "Name Your Price" style quiz below to find out!
       </p>
 
-      <.form for={@form} phx-submit="start_game" class="flex flex-col items-stretch gap-2 mt-16">
+      <.form
+        for={@form}
+        phx-submit="start_seeded_game"
+        class="flex flex-col items-stretch gap-2 mt-8"
+      >
+        <.button phx-click="start_daily_game" class="mb-4">Play Daily</.button>
+
         <div>
           <.label>Seed</.label>
           <.input type="text" inputmode="numeric" pattern="[0-9]{4}" field={@form[:seed]} />
         </div>
-        <.button type="submit">Play</.button>
+        <.button type="submit">Play Seeded Game</.button>
       </.form>
 
       <p class="mt-8 text-sm">
@@ -87,7 +93,11 @@ defmodule WhatCouldItCostWeb.HomeLive do
     {:ok, assign(socket, %{:form => form}), layout: false}
   end
 
-  def handle_event("start_game", %{"seed" => seed}, socket) do
+  def handle_event("start_seeded_game", %{"seed" => seed}, socket) do
     {:noreply, redirect(socket, to: "/play/#{seed}")}
+  end
+
+  def handle_event("start_daily_game", _params, socket) do
+    {:noreply, redirect(socket, to: "/play/daily")}
   end
 end
