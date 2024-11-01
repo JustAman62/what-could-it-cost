@@ -19,7 +19,7 @@ defmodule WhatCouldItCostWeb.Router do
     pipe_through :browser
 
     live "/", HomeLive, :home
-    live "/play", PlayLive
+    live "/play/:initial_seed", PlayLive
   end
 
   # Other scopes may use custom stacks.

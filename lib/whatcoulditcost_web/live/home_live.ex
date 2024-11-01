@@ -38,6 +38,6 @@ defmodule WhatCouldItCostWeb.HomeLive do
   end
 
   def handle_event("start_game", %{"seed" => seed}, socket) do
-    {:noreply, redirect(socket, to: "/play")}
+    {:noreply, redirect(socket, to: "/play/#{seed}")}
   end
 end
