@@ -43,7 +43,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
       </div>
       <.button type="submit" class="bg-brand flex">
         <svg
-          class="w-6 h-6 text-gray-800 dark:text-white"
+          class="w-6 h-6 text-white"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -105,7 +105,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
       phx-key="Enter"
     >
       <svg
-        class="w-6 h-6 text-gray-800 dark:text-white"
+        class="w-6 h-6 text-white"
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -137,12 +137,12 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
     <h2 class="font-semibold text-lg mt-4">Share</h2>
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-2 text-white">
       <.copy_button id="copy-button" content={@results_text} />
       <.share_button id="share-button" content={@results_text} />
       <.button class="bg-brand mt-4 flex" phx-click="play_again">
         <svg
-          class="w-6 h-6 text-gray-800 dark:text-white"
+          class="w-6 h-6 text-white"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
