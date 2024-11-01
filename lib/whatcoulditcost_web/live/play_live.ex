@@ -299,8 +299,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
     else
       results_text = """
       #{socket.assigns.results_text}
+      Score: #{socket.assigns.score}/5000
 
-      Could you do better?
       Try for yourself: https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
       """
 
