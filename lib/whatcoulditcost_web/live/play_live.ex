@@ -231,7 +231,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
            :score => 0,
            :last_score => 0,
            :last_answer => 0.0,
-           :form => %{"price" => ""} |> to_form()
+           :form => %{"price" => ""} |> to_form(),
+           :results_text => "What Could It Cost?\n"
          })}
 
       _ ->
@@ -252,11 +253,12 @@ defmodule WhatCouldItCostWeb.PlayLive do
         diff = abs(product_price - price)
         # Score by giving max points (1000) for bang on, then remove 2 point per penny away
         # if you are more than £5 away, then you get 0 points
-        score = round(max(0, 1000 - diff * 200))
+        round_score = round(max(0, 1000 - diff * 200))
 
         socket = assign(socket, :last_answer, price)
-        socket = assign(socket, :last_score, score)
-        socket = update(socket, :score, &(&1 + score))
+        socket = assign(socket, :last_score, round_score)
+        socket = update(socket, :score, &(&1 + round_score))
+        socket = update(socket, :results_text, &(&1 <> "\n#{emoji_progress_bar(round_score, 1000)}"))
         socket = assign(socket, :stage, :review_score)
 
         {:noreply, socket}
@@ -287,10 +289,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
       {:noreply, socket}
     else
       results_text = """
-      What Could It Cost?
-
-      #{emoji_progress_bar(socket.assigns.score, 5000)}
-      #{socket.assigns.score}/5000
+      #{socket.assigns.results_text}
 
       Could you do better?
       Try for yourself: https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
