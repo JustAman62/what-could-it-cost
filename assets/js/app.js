@@ -71,7 +71,7 @@ window.liveSocket = liveSocket
 
 window.addEventListener("phx:copy", (event) => {
   let button = event.detail.dispatcher;
-  let text = event.target.innerText;
+  let text = event.target.innerText.trim();
 
   navigator.clipboard.writeText(text).then(() => {
     let original = button.innerHTML
@@ -83,7 +83,7 @@ window.addEventListener("phx:copy", (event) => {
 });
 
 window.addEventListener("phx:share", (event) => {
-  let text = event.target.innerText;
+  let text = event.target.innerText.trim();
 
   let shareData = {
     title: "What Could It Cost?",

@@ -245,7 +245,10 @@ defmodule WhatCouldItCostWeb.PlayLive do
            :last_score => 0,
            :last_answer => 0.0,
            :form => %{"price" => ""} |> to_form(),
-           :results_text => "What Could It Cost?\n"
+           :results_text => """
+           What Could It Cost?
+           ##{initial_seed_val}
+           """
          })}
 
       _ ->
@@ -258,6 +261,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
   end
 
   def handle_event("submit_answer", %{"price" => price}, socket) do
+    socket = clear_flash(socket)
+
     case Float.parse(price) do
       # Calculate the score for this round
       {price, ""} when price > 0 ->
@@ -273,7 +278,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
           |> assign(:last_answer, price)
           |> assign(:last_score, round_score)
           |> update(:score, &(&1 + round_score))
-          |> update(:results_text, &(&1 <> "\n#{emoji_progress_bar(round_score, 1000)}"))
+          |> update(:results_text, &(&1 <> "#{emoji_progress_bar(round_score, 1000)}\n"))
           |> assign(:stage, :review_score)
 
         {:noreply, socket}
@@ -306,10 +311,10 @@ defmodule WhatCouldItCostWeb.PlayLive do
       {:noreply, socket}
     else
       results_text = """
-      #{socket.assigns.results_text}
+      #{socket.assigns.results_text |> String.trim("\n")}
       Score: #{socket.assigns.score}/5000
 
-      Try for yourself: https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
+      https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
       """
 
       socket =
