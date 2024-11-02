@@ -22,10 +22,37 @@ import { Socket } from "phoenix"
 import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+let hooks = {}
+
+hooks.saveGameResult = {
+  mounted() {
+    this.handleEvent("saveGameResult", (data) => {
+      console.log("saving game result")
+      localStorage.setItem("gameResult", JSON.stringify(data))
+    })
+  }
+}
+
+hooks.restoreGameResult = {
+  mounted() {
+    data = localStorage.getItem("gameResult")
+    if (data) {
+      console.log("restoring game result")
+      data = JSON.parse(data)
+      this.pushEvent("restoreGameResult", {
+        results_text: data.results_text,
+        score: data.score,
+        date: data.date
+      })
+    }
+  }
+}
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: { _csrf_token: csrfToken }
+  params: { _csrf_token: csrfToken },
+  hooks: hooks,
 })
 
 // Show progress bar on live navigation and form submits

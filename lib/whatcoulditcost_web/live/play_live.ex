@@ -3,7 +3,9 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
   defp render_waiting_for_answer(assigns) do
     ~H"""
-    <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
+    <p class="font-semibold text-lg mb-2" id="round-number" phx-hook="restoreGameResult">
+      Round <%= @index + 1 %>/5
+    </p>
     <img src={@product["img"]} class="h-52 md:h-64 w-auto rounded-xl shadow-lg p-4 bg-white" />
     <div class="my-4 flex flex-col items-center">
       <h1 class="text-2xl md:text-3xl font-semibold"><%= @product["brand"] %></h1>
@@ -180,7 +182,11 @@ defmodule WhatCouldItCostWeb.PlayLive do
     assigns = assign(assigns, :inner, inner)
 
     ~H"""
-    <div class="flex flex-col items-center md:ring-1 ring-black rounded-xl md:px-4 md:pt-2 md:pb-4 text-center">
+    <div
+      class="flex flex-col items-center md:ring-1 ring-black rounded-xl md:px-4 md:pt-2 md:pb-4 text-center"
+      id="wrapper"
+      phx-hook="saveGameResult"
+    >
       <%= @inner %>
     </div>
 
@@ -212,10 +218,10 @@ defmodule WhatCouldItCostWeb.PlayLive do
   end
 
   def mount(%{"initial_seed" => initial_seed}, _session, socket) do
-    initial_seed_val =
+    {type, initial_seed_val} =
       case initial_seed do
-        "daily" -> "#{Date.diff(NaiveDateTime.utc_now(), ~D[2024-10-01]) + 1000}"
-        _ -> initial_seed
+        "daily" -> {:daily, "#{Date.diff(NaiveDateTime.utc_now(), ~D[2024-10-01]) + 1000}"}
+        _ -> {:seeded, initial_seed}
       end
 
     case Integer.parse(initial_seed_val) do
@@ -231,6 +237,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
          assign(socket, %{
            :stage => :waiting_for_answer,
            :index => 0,
+           :type => type,
            :initial_seed => initial_seed,
            :seed => {:exsss, [1 | initial_seed_val]},
            :product => product_data,
@@ -261,14 +268,13 @@ defmodule WhatCouldItCostWeb.PlayLive do
         # if you are more than £5 away, then you get 0 points
         round_score = round(max(0, 1000 - diff * 200))
 
-        socket = assign(socket, :last_answer, price)
-        socket = assign(socket, :last_score, round_score)
-        socket = update(socket, :score, &(&1 + round_score))
-
         socket =
-          update(socket, :results_text, &(&1 <> "\n#{emoji_progress_bar(round_score, 1000)}"))
-
-        socket = assign(socket, :stage, :review_score)
+          socket
+          |> assign(:last_answer, price)
+          |> assign(:last_score, round_score)
+          |> update(:score, &(&1 + round_score))
+          |> update(:results_text, &(&1 <> "\n#{emoji_progress_bar(round_score, 1000)}"))
+          |> assign(:stage, :review_score)
 
         {:noreply, socket}
 
@@ -289,11 +295,13 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
       product_data = Enum.at(all_data, next_product_index)
 
-      socket = update(socket, :index, &(&1 + 1))
-      socket = assign(socket, :product, product_data)
-      socket = assign(socket, :seed, :rand.export_seed())
-      socket = assign(socket, :form, %{"price" => ""} |> to_form())
-      socket = assign(socket, :stage, :waiting_for_answer)
+      socket =
+        socket
+        |> update(:index, &(&1 + 1))
+        |> assign(:product, product_data)
+        |> assign(:seed, :rand.export_seed())
+        |> assign(:form, %{"price" => ""} |> to_form())
+        |> assign(:stage, :waiting_for_answer)
 
       {:noreply, socket}
     else
@@ -304,8 +312,22 @@ defmodule WhatCouldItCostWeb.PlayLive do
       Try for yourself: https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
       """
 
-      socket = assign(socket, :stage, :finished)
-      socket = assign(socket, :results_text, results_text)
+      socket =
+        socket
+        |> assign(:stage, :finished)
+        |> assign(:results_text, results_text)
+
+      socket =
+        if socket.assigns.type == :daily do
+          push_event(socket, "saveGameResult", %{
+            results_text: socket.assigns.results_text,
+            score: socket.assigns.score,
+            date: NaiveDateTime.utc_now()
+          })
+        else
+          socket
+        end
+
       {:noreply, socket}
     end
   end
@@ -313,6 +335,25 @@ defmodule WhatCouldItCostWeb.PlayLive do
   def handle_event("play_again", _params, socket) do
     seed = :rand.uniform(9000) + 1000
     {:noreply, redirect(socket, to: "/play/#{seed}")}
+  end
+
+  def handle_event(
+        "restoreGameResult",
+        %{"results_text" => results_text, "score" => score, "date" => date},
+        socket
+      ) do
+    socket =
+      if socket.assigns.type == :daily &&
+           Date.diff(NaiveDateTime.utc_now(), NaiveDateTime.from_iso8601!(date)) == 0 do
+        socket
+        |> assign(:stage, :finished)
+        |> assign(:score, score)
+        |> assign(:results_text, results_text)
+      else
+        socket
+      end
+
+    {:noreply, socket}
   end
 
   defp emoji_progress_bar(score, total_score) do
