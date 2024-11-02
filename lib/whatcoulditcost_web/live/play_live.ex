@@ -40,6 +40,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
           max="1000.0"
           value={@form[:price].value}
           autofocus
+          phx-mounted={JS.focus()}
           class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 ps-10"
         />
       </div>
@@ -76,8 +77,17 @@ defmodule WhatCouldItCostWeb.PlayLive do
       <h2 class="text-lg md:text-xl"><%= @product["name"] %></h2>
     </div>
 
-    <div class="w-64 md:w-96 bg-gray-200 rounded-full h-2.5">
-      <div class="bg-green-600 h-2.5 rounded-full" style={"width: #{(@last_score/1000) * 100}%"}>
+    <div class="w-64 md:w-96 bg-gray-200 flex rounded-full h-2.5">
+      <div
+        id="progress"
+        class="bg-green-600 h-2.5 rounded-full"
+        style={"max-width: #{(@last_score/1000) * 100}%"}
+        phx-mounted={
+          JS.transition({"transition-[width] ease-in-out duration-1000", "w-0", "w-[100%]"},
+            time: 1000
+          )
+        }
+      >
       </div>
     </div>
 
