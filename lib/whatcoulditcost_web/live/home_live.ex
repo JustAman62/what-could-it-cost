@@ -14,11 +14,7 @@ defmodule WhatCouldItCostWeb.HomeLive do
         Play our "Name Your Price" style quiz below to find out!
       </p>
 
-      <.form
-        for={@form}
-        phx-submit="start_seeded_game"
-        class="flex flex-col items-stretch gap-2 mt-8"
-      >
+      <.form for={@form} phx-submit="start_seeded_game" class="flex flex-col items-stretch gap-2 mt-8">
         <.button phx-click="start_daily_game" class="mb-4">Play Daily</.button>
 
         <div>
@@ -79,6 +75,14 @@ defmodule WhatCouldItCostWeb.HomeLive do
           </svg>
 
           <span>More Games by Aman Dhoot</span>
+        </a>
+
+        <a href="https://ko-fi.com/C0C8XGTAR" target="_blank">
+          <img
+            class="h-8"
+            src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
+            alt="Buy Me a Coffee at ko-fi.com"
+          />
         </a>
       </div>
     </div>

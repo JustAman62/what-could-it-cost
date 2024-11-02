@@ -172,6 +172,10 @@ defmodule WhatCouldItCostWeb.PlayLive do
         </svg>
         <span class="grow text-center">Play Again</span>
       </.button>
+
+      <a href="https://ko-fi.com/C0C8XGTAR" target="_blank">
+        <img class="w-32 mt-4 mx-auto" src="https://storage.ko-fi.com/cdn/kofi6.png?v=6" alt="Buy Me a Coffee at ko-fi.com" />
+      </a>
     </div>
     """
   end
