@@ -24,9 +24,9 @@ defmodule WhatCouldItCostWeb.ConnCase do
 
       use WhatCouldItCostWeb, :verified_routes
 
-      # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
+      import Phoenix.LiveViewTest
       import WhatCouldItCostWeb.ConnCase
     end
   end

@@ -14,7 +14,7 @@ All games are 5 rounds long, and have a seed. The seed is used to seed the RNG w
 
 Daily games have a seed calculated as the number of days since the 1st October 2024, plus an offset of 1000 days.
 
-Scoring is determined on how far your guess is from the actual price. If you're bang-on, then you'll receive 1000 points. Every penny you are away from the price, you lose 2 points. Once you are £5 away from the price, you receive 0 points.
+Scoring is determined on how far your guess is from the actual price. If you're bang-on, then you'll receive 1000 points. Every penny you are away from the price, you lose 4 points. Once you are £2.50 away from the price, you receive 0 points.
 
 ## Commands
 

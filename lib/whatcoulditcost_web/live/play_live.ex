@@ -11,7 +11,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
       <h1 class="text-2xl md:text-3xl font-semibold"><%= @product["brand"] %></h1>
       <h2 class="text-lg md:text-xl"><%= @product["name"] %></h2>
     </div>
-    <.form for={@form} phx-submit="submit_answer" class="flex flex-col items-stretch">
+    <.form for={@form} id="price-form" phx-submit="submit_answer" class="flex flex-col items-stretch">
       <.label for="price">Price</.label>
       <div class="relative mb-6">
         <div class="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
@@ -44,7 +44,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
           class="mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6 ps-10"
         />
       </div>
-      <.button type="submit" class="bg-brand flex">
+      <.button id="submit-price" type="submit" class="bg-brand flex">
         <svg
           class="w-6 h-6 text-white"
           aria-hidden="true"
@@ -283,9 +283,9 @@ defmodule WhatCouldItCostWeb.PlayLive do
         {product_price, ""} = Float.parse(socket.assigns.product["price"])
 
         diff = abs(product_price - price)
-        # Score by giving max points (1000) for bang on, then remove 2 point per penny away
-        # if you are more than £5 away, then you get 0 points
-        round_score = round(max(0, 1000 - diff * 200))
+        # Score by giving max points (1000) for bang on, then remove 4 points per penny away
+        # if you are more than £2.50 away, then you get 0 points
+        round_score = round(max(0, 1000 - diff * 400))
 
         socket =
           socket
