@@ -2,7 +2,7 @@ defmodule WhatCouldItCostWeb.PlayLiveTest do
   use WhatCouldItCostWeb.ConnCase
 
   def test_round(conn, input, expected_score) do
-    {:ok, view, html} = live(conn, "/play/1001")
+    {:ok, view, html} = live(conn, ~p"/play/1001")
 
     # Product 1 actual price: £2.84
     assert html =~ "Blue Dragon"
