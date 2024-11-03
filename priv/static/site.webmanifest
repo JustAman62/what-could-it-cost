@@ -1,19 +1,21 @@
 {
-    "name": "What Could It Cost?",
-    "short_name": "What Could It Cost?",
-    "icons": [
-        {
-            "src": "/images/android-chrome-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/images/android-chrome-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ],
-    "theme_color": "#fee047",
-    "background_color": "#fee047",
-    "display": "standalone"
+  "name": "What Could It Cost?",
+  "short_name": "What Could It Cost?",
+  "icons": [
+    {
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#fee047",
+  "background_color": "#fee047",
+  "display": "standalone"
 }
