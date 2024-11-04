@@ -174,7 +174,11 @@ defmodule WhatCouldItCostWeb.PlayLive do
       </.button>
 
       <a href="https://ko-fi.com/C0C8XGTAR" target="_blank">
-        <img class="w-32 mt-4 mx-auto" src="https://storage.ko-fi.com/cdn/kofi6.png?v=6" alt="Buy Me a Coffee at ko-fi.com" />
+        <img
+          class="w-32 mt-4 mx-auto"
+          src="https://storage.ko-fi.com/cdn/kofi6.png?v=6"
+          alt="Buy Me a Coffee at ko-fi.com"
+        />
       </a>
     </div>
     """
@@ -247,6 +251,12 @@ defmodule WhatCouldItCostWeb.PlayLive do
         initial_product_index = rem(initial_seed_val, Enum.count(all_products))
         product_data = Enum.at(all_products, initial_product_index)
 
+        # Mount is called twice, once on initial render, then once on ws connection
+        # only record the metric on the second render (the live one)
+        if connected?(socket) do
+          :telemetry.execute([:wcic, :game, :started], %{count: 1}, %{initial_seed: initial_seed})
+        end
+
         {:ok,
          assign(socket, %{
            :stage => :waiting_for_answer,
@@ -262,16 +272,13 @@ defmodule WhatCouldItCostWeb.PlayLive do
            :results_text => """
            What Could It Cost?
            ##{initial_seed_val}
-           """
+           """,
+           :start_time => NaiveDateTime.utc_now()
          })}
 
       _ ->
         {:ok, assign(socket, %{:stage => :invalid_seed})}
     end
-  end
-
-  def handle_event("start_game", _params, socket) do
-    {:noreply, assign(socket, :stage, :waiting_for_answer)}
   end
 
   def handle_event("submit_answer", %{"price" => price}, socket) do
@@ -346,6 +353,20 @@ defmodule WhatCouldItCostWeb.PlayLive do
         else
           socket
         end
+
+      duration = Time.diff(NaiveDateTime.utc_now(), socket.assigns.start_time)
+
+      :telemetry.execute(
+        [:wcic, :game, :ended],
+        %{duration: duration},
+        %{initial_seed: socket.assigns.initial_seed}
+      )
+
+      :telemetry.execute(
+        [:wcic, :game, :ended],
+        %{score: socket.assigns.score},
+        %{initial_seed: socket.assigns.initial_seed}
+      )
 
       {:noreply, socket}
     end

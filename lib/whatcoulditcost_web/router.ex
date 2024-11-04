@@ -20,6 +20,8 @@ defmodule WhatCouldItCostWeb.Router do
 
     live "/", HomeLive, :home
     live "/play/:initial_seed", PlayLive
+
+    get "/metrics", TelemetryController, :metrics
   end
 
   # Other scopes may use custom stacks.
