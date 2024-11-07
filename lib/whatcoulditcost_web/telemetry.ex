@@ -58,11 +58,11 @@ defmodule WhatCouldItCostWeb.Telemetry do
 
       # Custom game metrics
       sum("wcic.game.started.count",
-        tags: [:initial_seed],
+        tags: [:type],
         prometheus_type: :counter
       ),
       distribution("wcic.game.ended.duration",
-        tags: [:initial_seed],
+        tags: [:type],
         measurement: :duration,
         unit: :second,
         reporter_options: [
@@ -70,7 +70,7 @@ defmodule WhatCouldItCostWeb.Telemetry do
         ]
       ),
       distribution("wcic.game.ended.score",
-        tags: [:initial_seed],
+        tags: [:type],
         reporter_options: [
           buckets: [1000, 2000, 3000, 4000, 5000]
         ]

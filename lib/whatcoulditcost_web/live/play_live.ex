@@ -6,7 +6,10 @@ defmodule WhatCouldItCostWeb.PlayLive do
     <p class="font-semibold text-lg mb-2" id="round-number" phx-hook="restoreGameResult">
       Round <%= @index + 1 %>/5
     </p>
-    <img src={@product["img"]} class="h-52 md:h-64 w-auto rounded-xl shadow-lg p-4 bg-white" />
+    <img
+      src={@product["img"]}
+      class="h-52 md:h-64 w-52 md:w-64 w-auto rounded-xl shadow-lg p-4 bg-white"
+    />
     <div class="my-4 flex flex-col items-center">
       <h1 class="text-2xl md:text-3xl font-semibold"><%= @product["brand"] %></h1>
       <h2 class="text-lg md:text-xl"><%= @product["name"] %></h2>
@@ -140,14 +143,47 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
   defp render_finished(assigns) do
     ~H"""
-    <div class="w-64 md:w-96 bg-gray-200 rounded-full h-2.5 mt-4">
-      <div class="bg-green-600 h-2.5 rounded-full" style={"width: #{@score/50}%"}></div>
+    <div class="w-64 md:w-96 bg-gray-200 flex rounded-full h-2.5 mt-4">
+      <div
+        id="progress"
+        class="bg-green-600 h-2.5 rounded-full"
+        style={"max-width: #{(@score/5000) * 100}%"}
+        phx-mounted={
+          JS.transition({"transition-[width] ease-in-out duration-1000", "w-0", "w-[100%]"},
+            time: 1000
+          )
+        }
+      >
+      </div>
     </div>
 
-    <p class="font-semibold text-sm mt-4">Your Score</p>
+    <p class="font-semibold text-sm mt-2">Your Score</p>
     <p class="font-bold text-xl"><%= @score %> / 5000</p>
 
-    <h2 class="font-semibold text-lg mt-4">Share</h2>
+    <div class="divide-y divide-black mt-2">
+      <div :for={result <- @results} class="flex p-2 self-stretch gap-2">
+        <img
+          src={result["product"]["img"]}
+          class="h-14 w-14 w-auto rounded-lg shadow-lg p-1 bg-white self-center"
+        />
+        <div class="flex flex-col items-start justify-start text-left grow">
+          <h1 class="text-md font-semibold"><%= result["product"]["brand"] %></h1>
+          <h2 class="text-xs"><%= result["product"]["name"] %></h2>
+        </div>
+        <div class="flex flex-col items-center justify-center text-center flex-none w-12">
+          <p class="font-semibold text-xs">You</p>
+          <p class="font-bold text-md">
+            £<%= :erlang.float_to_binary(result["price"] * 1.0, decimals: 2) %>
+          </p>
+        </div>
+        <div class="flex flex-col items-center justify-center text-center flex-none w-12">
+          <p class="font-semibold text-xs">Actual</p>
+          <p class="font-bold text-md">£<%= result["product"]["price"] %></p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="font-semibold text-lg mt-4 mb-2">Share</h2>
 
     <div class="flex flex-col gap-2 text-white">
       <.copy_button id="copy-button" content={@results_text} />
@@ -170,7 +206,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
             d="M13.484 9.166 15 7h5m0 0-3-3m3 3-3 3M4 17h4l1.577-2.253M4 7h4l7 10h5m0 0-3 3m3-3-3-3"
           />
         </svg>
-        <span class="grow text-center">Play Again</span>
+        <span class="grow text-center">Play Random</span>
       </.button>
 
       <a href="https://ko-fi.com/C0C8XGTAR" target="_blank">
@@ -254,7 +290,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
         # Mount is called twice, once on initial render, then once on ws connection
         # only record the metric on the second render (the live one)
         if connected?(socket) do
-          :telemetry.execute([:wcic, :game, :started], %{count: 1}, %{initial_seed: initial_seed})
+          :telemetry.execute([:wcic, :game, :started], %{count: 1}, %{type: type})
         end
 
         {:ok,
@@ -269,6 +305,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
            :last_score => 0,
            :last_answer => 0.0,
            :form => %{"price" => ""} |> to_form(),
+           :results => [],
            :results_text => """
            What Could It Cost?
            ##{initial_seed_val}
@@ -299,6 +336,11 @@ defmodule WhatCouldItCostWeb.PlayLive do
           |> assign(:last_answer, price)
           |> assign(:last_score, round_score)
           |> update(:score, &(&1 + round_score))
+          |> update(
+            :results,
+            &(&1 ++
+                [%{"product" => socket.assigns.product, "score" => round_score, "price" => price}])
+          )
           |> update(:results_text, &(&1 <> "#{emoji_progress_bar(round_score, 1000)}\n"))
           |> assign(:stage, :review_score)
 
@@ -347,6 +389,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
         if socket.assigns.type == :daily do
           push_event(socket, "saveGameResult", %{
             results_text: socket.assigns.results_text,
+            results: socket.assigns.results,
             score: socket.assigns.score,
             date: NaiveDateTime.utc_now()
           })
@@ -359,13 +402,13 @@ defmodule WhatCouldItCostWeb.PlayLive do
       :telemetry.execute(
         [:wcic, :game, :ended],
         %{duration: duration},
-        %{initial_seed: socket.assigns.initial_seed}
+        %{type: socket.assigns.type}
       )
 
       :telemetry.execute(
         [:wcic, :game, :ended],
         %{score: socket.assigns.score},
-        %{initial_seed: socket.assigns.initial_seed}
+        %{type: socket.assigns.type}
       )
 
       {:noreply, socket}
@@ -379,7 +422,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
   def handle_event(
         "restoreGameResult",
-        %{"results_text" => results_text, "score" => score, "date" => date},
+        %{"results_text" => results_text, "score" => score, "date" => date, "results" => results},
         socket
       ) do
     socket =
@@ -389,6 +432,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
         |> assign(:stage, :finished)
         |> assign(:score, score)
         |> assign(:results_text, results_text)
+        |> assign(:results, results)
       else
         socket
       end

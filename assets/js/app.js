@@ -42,7 +42,8 @@ hooks.restoreGameResult = {
       this.pushEvent("restoreGameResult", {
         results_text: data.results_text,
         score: data.score,
-        date: data.date
+        date: data.date,
+        results: data.results ?? []
       })
     }
   }
