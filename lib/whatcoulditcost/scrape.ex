@@ -40,6 +40,23 @@ defmodule WhatCouldItCost.Scrape do
             |> List.last()
             |> String.trim(" "),
           brand: Floki.find(x, "._title > span") |> Floki.text() |> String.trim(" "),
+          prev_price:
+            Floki.find(document, "tr.product_#{product_id} td:nth-child(3)")
+            # Take the first 4 store entries, which should be Asda, Tesco, Sainburys, and Morrisons.
+            # We ignore all the others as they aren't always there, or contain outliers
+            |> Enum.take(4)
+            |> Enum.map(fn y ->
+              y
+              |> Floki.text()
+              |> String.trim(" ")
+              |> String.trim("£")
+              |> Decimal.parse()
+              |> elem(0)
+            end)
+            |> Enum.reduce(&Decimal.add(&1, &2))
+            |> Decimal.div(Decimal.new(4))
+            |> Decimal.round(2)
+            |> Decimal.to_string(:normal),
           price:
             Floki.find(document, "tr.product_#{product_id} td:nth-child(4)")
             # Take the first 4 store entries, which should be Asda, Tesco, Sainburys, and Morrisons.

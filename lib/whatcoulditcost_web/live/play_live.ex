@@ -74,6 +74,13 @@ defmodule WhatCouldItCostWeb.PlayLive do
   end
 
   defp render_review_score(assigns) do
+    assigns =
+      assigns
+      |> assign(product_price: Decimal.parse(assigns.product["price"]) |> elem(0))
+      |> assign(
+        prev_product_price: Decimal.parse(assigns.product["prev_price"]) |> elem(0)
+      )
+
     ~H"""
     <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
     <img
@@ -103,6 +110,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
       <div class="flex flex-col grow items-center text-center">
         <p class="font-semibold text-sm">Your Answer</p>
         <p class="font-bold text-xl">£<%= :erlang.float_to_binary(@last_answer, decimals: 2) %></p>
+        <div class="h-4"></div>
 
         <p class="font-semibold text-sm mt-4">Round Score</p>
         <p class="font-bold text-xl"><%= @last_score %> / 1000</p>
@@ -112,6 +120,20 @@ defmodule WhatCouldItCostWeb.PlayLive do
         <p class="font-bold text-xl">
           £<%= :erlang.float_to_binary(String.to_float(@product["price"]), decimals: 2) %>
         </p>
+        <%= case Decimal.compare(@product_price, @prev_product_price) do %>
+          <% :lt -> %>
+            <span class="text-[0.65rem] h-4 font-semibold text-green-600 flex items-center gap-1">
+              <.icon name="hero-arrow-down-right" class="h-3 w-3" />
+              £<%= Decimal.sub(@prev_product_price, @product_price) |> Decimal.to_string() %> since Oct 2023
+            </span>
+          <% :gt -> %>
+            <span class="text-[0.65rem] h-4 font-semibold text-red-600 flex items-center gap-1">
+              <.icon name="hero-arrow-up-right" class="h-3 w-3" />
+              £<%= Decimal.sub(@product_price, @prev_product_price) |> Decimal.to_string() %> since Oct 2023
+            </span>
+          <% _ -> %>
+            <div class="h-4"></div>
+        <% end %>
 
         <p class="font-semibold text-sm mt-4">Total Score</p>
         <p class="font-bold text-xl"><%= @score %></p>
@@ -167,24 +189,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
     <div class="divide-y divide-black mt-2">
       <div :for={result <- @results} class="flex p-2 self-stretch gap-2">
-        <img
-          src={"https://trolley.co.uk/img/product/#{result["product"]["product_id"]}"}
-          class="h-14 w-14 rounded-lg shadow-lg p-1 bg-white self-center"
-        />
-        <div class="flex flex-col items-start justify-start text-left grow">
-          <h1 class="text-md font-semibold"><%= result["product"]["brand"] %></h1>
-          <h2 class="text-xs"><%= result["product"]["name"] %></h2>
-        </div>
-        <div class="flex flex-col items-center justify-center text-center flex-none w-12">
-          <p class="font-semibold text-xs">You</p>
-          <p class="font-bold text-md">
-            £<%= :erlang.float_to_binary(result["price"] * 1.0, decimals: 2) %>
-          </p>
-        </div>
-        <div class="flex flex-col items-center justify-center text-center flex-none w-12">
-          <p class="font-semibold text-xs">Actual</p>
-          <p class="font-bold text-md">£<%= result["product"]["price"] %></p>
-        </div>
+        <.finished_product result={result} />
       </div>
     </div>
 
@@ -221,6 +226,52 @@ defmodule WhatCouldItCostWeb.PlayLive do
           alt="Buy Me a Coffee at ko-fi.com"
         />
       </a>
+    </div>
+    """
+  end
+
+  attr :result, :map, required: true
+
+  def finished_product(assigns) do
+    assigns =
+      assigns
+      |> assign(product_price: Decimal.parse(assigns.result["product"]["price"]) |> elem(0))
+      |> assign(
+        prev_product_price: Decimal.parse(assigns.result["product"]["prev_price"]) |> elem(0)
+      )
+
+    ~H"""
+    <img
+      src={"https://trolley.co.uk/img/product/#{@result["product"]["product_id"]}"}
+      class="h-14 w-14 rounded-lg shadow-lg p-1 bg-white self-center"
+    />
+    <div class="flex flex-col items-start justify-start text-left grow">
+      <h1 class="text-md font-semibold"><%= @result["product"]["brand"] %></h1>
+      <h2 class="text-xs"><%= @result["product"]["name"] %></h2>
+      <%= case Decimal.compare(@product_price, @prev_product_price) do %>
+        <% :lt -> %>
+          <span class="text-[0.65rem] font-semibold text-green-600 flex items-center gap-1">
+            <.icon name="hero-arrow-down-right" class="h-3 w-3" />
+            £<%= Decimal.sub(@prev_product_price, @product_price) |> Decimal.to_string() %> since Oct 2023
+          </span>
+        <% :gt -> %>
+          <span class="text-[0.65rem] font-semibold text-red-600 flex items-center gap-1">
+            <.icon name="hero-arrow-up-right" class="h-3 w-3" />
+            £<%= Decimal.sub(@product_price, @prev_product_price) |> Decimal.to_string() %> since Oct 2023
+          </span>
+        <% _ -> %>
+          <span></span>
+      <% end %>
+    </div>
+    <div class="flex flex-col items-center justify-center text-center flex-none w-12">
+      <p class="font-semibold text-xs">You</p>
+      <p class="font-bold text-md">
+        £<%= :erlang.float_to_binary(@result["price"] * 1.0, decimals: 2) %>
+      </p>
+    </div>
+    <div class="flex flex-col items-center justify-center text-center flex-none w-12">
+      <p class="font-semibold text-xs">Actual</p>
+      <p class="font-bold text-md">£<%= Decimal.to_string(@product_price) %></p>
     </div>
     """
   end
