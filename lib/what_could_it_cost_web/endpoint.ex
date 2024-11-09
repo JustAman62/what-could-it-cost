@@ -1,12 +1,12 @@
 defmodule WhatCouldItCostWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :whatcoulditcost
+  use Phoenix.Endpoint, otp_app: :what_could_it_cost
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_whatcoulditcost_key",
+    key: "_what_could_it_cost_key",
     signing_salt: "wz3vQ531",
     same_site: "Strict"
   ]
@@ -21,7 +21,7 @@ defmodule WhatCouldItCostWeb.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
-    from: :whatcoulditcost,
+    from: :what_could_it_cost,
     gzip: false,
     only: WhatCouldItCostWeb.static_paths()
 

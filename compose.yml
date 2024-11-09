@@ -11,4 +11,4 @@ services:
       PHX_HOST: localhost
       PORT: 4000
     volumes:
-      - "./priv/data:/app/lib/whatcoulditcost-0.1.0/priv/data:rw"
+      - "./priv/data:/app/lib/what_could_it_cost-0.1.0/priv/data:rw"

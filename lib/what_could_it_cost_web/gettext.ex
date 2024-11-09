@@ -20,5 +20,5 @@ defmodule WhatCouldItCostWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :whatcoulditcost
+  use Gettext, otp_app: :what_could_it_cost
 end

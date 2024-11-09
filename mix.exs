@@ -3,7 +3,7 @@ defmodule WhatCouldItCost.MixProject do
 
   def project do
     [
-      app: :whatcoulditcost,
+      app: :what_could_it_cost,
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -32,6 +32,7 @@ defmodule WhatCouldItCost.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
@@ -53,6 +54,7 @@ defmodule WhatCouldItCost.MixProject do
        depth: 1},
       {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
+      {:req, "~> 0.5.0"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
@@ -74,10 +76,10 @@ defmodule WhatCouldItCost.MixProject do
     [
       setup: ["deps.get", "assets.setup", "assets.build"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind whatcoulditcost", "esbuild whatcoulditcost"],
+      "assets.build": ["tailwind what_could_it_cost", "esbuild what_could_it_cost"],
       "assets.deploy": [
-        "tailwind whatcoulditcost --minify",
-        "esbuild whatcoulditcost --minify",
+        "tailwind what_could_it_cost --minify",
+        "esbuild what_could_it_cost --minify",
         "phx.digest"
       ]
     ]

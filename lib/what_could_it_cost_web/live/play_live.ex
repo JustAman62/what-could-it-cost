@@ -337,7 +337,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
     case Integer.parse(initial_seed_val) do
       {initial_seed_val, ""} when initial_seed_val >= 1000 and initial_seed_val < 10000 ->
         all_products =
-          File.stream!(Path.join(:code.priv_dir(:whatcoulditcost), "data/product_data.jl"))
+          File.stream!(Path.join(:code.priv_dir(:what_could_it_cost), "data/product_data.jl"))
           |> Enum.map(fn x -> Jason.decode!(x) end)
 
         initial_product_index = rem(initial_seed_val, Enum.count(all_products))
@@ -419,7 +419,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
       %{index: index, stage: :review_score} when index < 4 ->
         # Determine the next product
         all_data =
-          File.stream!(Path.join(:code.priv_dir(:whatcoulditcost), "data/product_data.jl"))
+          File.stream!(Path.join(:code.priv_dir(:what_could_it_cost), "data/product_data.jl"))
           |> Enum.map(fn x -> Jason.decode!(x) end)
 
         :rand.seed(socket.assigns.seed)

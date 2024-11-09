@@ -24,6 +24,7 @@ erl_crash.dump
 
 # Ignore package tarball (built via "mix hex.build").
 whatcoulditcost-*.tar
+what_could_it_cost-*.tar
 
 # Ignore assets that are produced by build tools.
 /priv/static/assets/
@@ -41,3 +42,5 @@ _build
 data
 
 .DS_Store
+
+*.db*

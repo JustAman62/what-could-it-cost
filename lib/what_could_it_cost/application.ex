@@ -11,9 +11,9 @@ defmodule WhatCouldItCost.Application do
       WhatCouldItCostWeb.Telemetry,
       WhatCouldItCost.Repo,
       {Ecto.Migrator,
-      repos: Application.fetch_env!(:whatcoulditcost, :ecto_repos),
+      repos: Application.fetch_env!(:what_could_it_cost, :ecto_repos),
       skip: skip_migrations?()},
-      {DNSCluster, query: Application.get_env(:whatcoulditcost, :dns_cluster_query) || :ignore},
+      {DNSCluster, query: Application.get_env(:what_could_it_cost, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: WhatCouldItCost.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: WhatCouldItCost.Finch},
