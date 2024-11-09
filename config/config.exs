@@ -77,6 +77,15 @@ config :crawly,
     {Crawly.Pipelines.WriteToFile, extension: "jl", folder: "priv/data"}
   ]
 
+# Cognito uses a custom response content type that we want to treat as JSON
+config :mime, :types, %{
+  "application/x-amz-json-1.1" => ["json"]
+}
+
+config :mime, :extensions, %{
+  "json" => "application/json"
+}
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

@@ -20,6 +20,9 @@ defmodule WhatCouldItCostWeb.Router do
 
     live "/", HomeLive, :home
     live "/play/:initial_seed", PlayLive
+    live "/login", LoginLive
+
+    post "/login", UserController, :login
 
     get "/metrics", TelemetryController, :metrics
   end
