@@ -9,6 +9,10 @@ defmodule WhatCouldItCost.Application do
   def start(_type, _args) do
     children = [
       WhatCouldItCostWeb.Telemetry,
+      WhatCouldItCost.Repo,
+      {Ecto.Migrator,
+      repos: Application.fetch_env!(:whatcoulditcost, :ecto_repos),
+      skip: skip_migrations?()},
       {DNSCluster, query: Application.get_env(:whatcoulditcost, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: WhatCouldItCost.PubSub},
       # Start the Finch HTTP client for sending emails
@@ -31,5 +35,10 @@ defmodule WhatCouldItCost.Application do
   def config_change(changed, _new, removed) do
     WhatCouldItCostWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp skip_migrations?() do
+    # By default, sqlite migrations are run when using a release
+    System.get_env("RUN_MIGRATIONS") != nil
   end
 end
