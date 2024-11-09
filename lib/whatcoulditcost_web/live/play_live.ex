@@ -35,12 +35,14 @@ defmodule WhatCouldItCostWeb.PlayLive do
           </svg>
         </div>
         <input
-          type="number"
           name="price"
           id="price"
           type="number"
+          inputmode="decimal"
+          pattern="[0-9\.]+"
           step="0.01"
           max="1000.0"
+          required
           value={@form[:price].value}
           autofocus
           phx-mounted={JS.focus()}
@@ -320,6 +322,12 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
   def handle_event("submit_answer", %{"price" => price}, socket) do
     socket = clear_flash(socket)
+
+    # If the price starts with a decimal point, prepend a 0 to make float parsing work correctly
+    price = case price do
+      "." <> _ -> "0" <> price
+      _ -> price
+    end
 
     case Float.parse(price) do
       # Calculate the score for this round
