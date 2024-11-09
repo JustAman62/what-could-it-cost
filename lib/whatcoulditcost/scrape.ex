@@ -26,15 +26,38 @@ defmodule WhatCouldItCost.Scrape do
       document
       |> Floki.find("tr.tr:not(.-store)")
       |> Enum.map(fn x ->
+        img_url = Floki.find(x, "._product-img > img") |> Floki.attribute("src") |> Enum.at(0)
+        product_id = String.split(img_url, "/", trim: true) |> List.last()
+
         %{
-          name: Floki.find(x, "._title") |> Floki.text() |> String.trim(" "),
+          # The title element contains a span, and a direct text node.
+          # The span has the brand name, the direct text contains the product name
+          # We can't select the direct text node directly, so we do some funky string stuff to extract just the product name
+          name:
+            Floki.find(x, "._title")
+            |> Floki.text(sep: "|||")
+            |> String.split("|||")
+            |> List.last()
+            |> String.trim(" "),
           brand: Floki.find(x, "._title > span") |> Floki.text() |> String.trim(" "),
           price:
-            Floki.find(x, "td:nth-child(4)")
-            |> Floki.text()
-            |> String.trim(" ")
-            |> String.trim("£"),
-          img: Floki.find(x, "._product-img > img") |> Floki.attribute("src") |> Enum.at(0)
+            Floki.find(document, "tr.product_#{product_id} td:nth-child(4)")
+            # Take the first 4 store entries, which should be Asda, Tesco, Sainburys, and Morrisons.
+            # We ignore all the others as they aren't always there, or contain outliers
+            |> Enum.take(4)
+            |> Enum.map(fn y ->
+              y
+              |> Floki.text()
+              |> String.trim(" ")
+              |> String.trim("£")
+              |> Decimal.parse()
+              |> elem(0)
+            end)
+            |> Enum.reduce(&Decimal.add(&1, &2))
+            |> Decimal.div(Decimal.new(4))
+            |> Decimal.round(2)
+            |> Decimal.to_string(:normal),
+          product_id: product_id
         }
       end)
 

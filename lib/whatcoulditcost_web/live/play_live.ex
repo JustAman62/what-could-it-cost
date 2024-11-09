@@ -7,8 +7,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
       Round <%= @index + 1 %>/5
     </p>
     <img
-      src={@product["img"]}
-      class="h-52 md:h-64 w-52 md:w-64 w-auto rounded-xl shadow-lg p-4 bg-white"
+      src={"https://trolley.co.uk/img/product/#{@product["product_id"]}"}
+      class="h-52 md:h-64 w-52 md:w-64 rounded-xl shadow-lg p-4 bg-white"
     />
     <div class="my-4 flex flex-col items-center">
       <h1 class="text-2xl md:text-3xl font-semibold"><%= @product["brand"] %></h1>
@@ -76,7 +76,10 @@ defmodule WhatCouldItCostWeb.PlayLive do
   defp render_review_score(assigns) do
     ~H"""
     <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
-    <img src={@product["img"]} class="h-52 md:h-64 w-auto rounded-xl shadow-lg p-4 bg-white" />
+    <img
+      src={"https://trolley.co.uk/img/product/#{@product["product_id"]}"}
+      class="h-52 md:h-64 w-52 md:w-64 rounded-xl shadow-lg p-4 bg-white"
+    />
     <div class="my-4 flex flex-col items-center">
       <h1 class="text-2xl md:text-3xl font-semibold"><%= @product["brand"] %></h1>
       <h2 class="text-lg md:text-xl"><%= @product["name"] %></h2>
@@ -165,8 +168,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
     <div class="divide-y divide-black mt-2">
       <div :for={result <- @results} class="flex p-2 self-stretch gap-2">
         <img
-          src={result["product"]["img"]}
-          class="h-14 w-14 w-auto rounded-lg shadow-lg p-1 bg-white self-center"
+          src={"https://trolley.co.uk/img/product/#{result["product"]["product_id"]}"}
+          class="h-14 w-14 rounded-lg shadow-lg p-1 bg-white self-center"
         />
         <div class="flex flex-col items-start justify-start text-left grow">
           <h1 class="text-md font-semibold"><%= result["product"]["brand"] %></h1>
@@ -324,10 +327,11 @@ defmodule WhatCouldItCostWeb.PlayLive do
     socket = clear_flash(socket)
 
     # If the price starts with a decimal point, prepend a 0 to make float parsing work correctly
-    price = case price do
-      "." <> _ -> "0" <> price
-      _ -> price
-    end
+    price =
+      case price do
+        "." <> _ -> "0" <> price
+        _ -> price
+      end
 
     case Float.parse(price) do
       # Calculate the score for this round
@@ -360,66 +364,71 @@ defmodule WhatCouldItCostWeb.PlayLive do
   end
 
   def handle_event("next_round", _params, socket) do
-    if socket.assigns.index < 4 do
-      # Determine the next product
-      all_data =
-        File.stream!(Path.join(:code.priv_dir(:whatcoulditcost), "data/product_data.jl"))
-        |> Enum.map(fn x -> Jason.decode!(x) end)
+    case socket.assigns do
+      %{index: index, stage: :review_score} when index < 4 ->
+        # Determine the next product
+        all_data =
+          File.stream!(Path.join(:code.priv_dir(:whatcoulditcost), "data/product_data.jl"))
+          |> Enum.map(fn x -> Jason.decode!(x) end)
 
-      :rand.seed(socket.assigns.seed)
-      next_product_index = :rand.uniform(Enum.count(all_data))
+        :rand.seed(socket.assigns.seed)
+        next_product_index = :rand.uniform(Enum.count(all_data))
 
-      product_data = Enum.at(all_data, next_product_index)
+        product_data = Enum.at(all_data, next_product_index)
 
-      socket =
-        socket
-        |> update(:index, &(&1 + 1))
-        |> assign(:product, product_data)
-        |> assign(:seed, :rand.export_seed())
-        |> assign(:form, %{"price" => ""} |> to_form())
-        |> assign(:stage, :waiting_for_answer)
-
-      {:noreply, socket}
-    else
-      results_text = """
-      #{socket.assigns.results_text |> String.trim("\n")}
-      Score: #{socket.assigns.score}/5000
-
-      https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
-      """
-
-      socket =
-        socket
-        |> assign(:stage, :finished)
-        |> assign(:results_text, results_text)
-
-      socket =
-        if socket.assigns.type == :daily do
-          push_event(socket, "saveGameResult", %{
-            results_text: socket.assigns.results_text,
-            results: socket.assigns.results,
-            score: socket.assigns.score,
-            date: NaiveDateTime.utc_now()
-          })
-        else
+        socket =
           socket
-        end
+          |> update(:index, &(&1 + 1))
+          |> assign(:product, product_data)
+          |> assign(:seed, :rand.export_seed())
+          |> assign(:form, %{"price" => ""} |> to_form())
+          |> assign(:stage, :waiting_for_answer)
 
-      duration = Time.diff(NaiveDateTime.utc_now(), socket.assigns.start_time)
+        {:noreply, socket}
 
-      :telemetry.execute(
-        [:wcic, :game, :ended],
-        %{duration: duration},
-        %{type: socket.assigns.type}
-      )
+      %{index: index, stage: :review_score} when index == 4 ->
+        results_text = """
+        #{socket.assigns.results_text |> String.trim("\n")}
+        Score: #{socket.assigns.score}/5000
 
-      :telemetry.execute(
-        [:wcic, :game, :ended],
-        %{score: socket.assigns.score},
-        %{type: socket.assigns.type}
-      )
+        https://whatcoulditcost.amandhoot.com/play/#{socket.assigns.initial_seed}
+        """
 
-      {:noreply, socket}
+        socket =
+          socket
+          |> assign(:stage, :finished)
+          |> assign(:results_text, results_text)
+
+        socket =
+          if socket.assigns.type == :daily do
+            push_event(socket, "saveGameResult", %{
+              results_text: socket.assigns.results_text,
+              results: socket.assigns.results,
+              score: socket.assigns.score,
+              date: NaiveDateTime.utc_now()
+            })
+          else
+            socket
+          end
+
+        duration = Time.diff(NaiveDateTime.utc_now(), socket.assigns.start_time)
+
+        :telemetry.execute(
+          [:wcic, :game, :ended],
+          %{duration: duration},
+          %{type: socket.assigns.type}
+        )
+
+        :telemetry.execute(
+          [:wcic, :game, :ended],
+          %{score: socket.assigns.score},
+          %{type: socket.assigns.type}
+        )
+
+        {:noreply, socket}
+
+      _ ->
+        {:noreply, socket}
     end
   end
 
