@@ -17,7 +17,7 @@ defmodule WhatCouldItCostWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt site.webmanifest)
+  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt site.webmanifest sitemap.xml)
 
   def router do
     quote do
