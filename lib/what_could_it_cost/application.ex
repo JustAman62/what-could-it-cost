@@ -11,12 +11,13 @@ defmodule WhatCouldItCost.Application do
       WhatCouldItCostWeb.Telemetry,
       WhatCouldItCost.Repo,
       {Ecto.Migrator,
-      repos: Application.fetch_env!(:what_could_it_cost, :ecto_repos),
-      skip: skip_migrations?()},
-      {DNSCluster, query: Application.get_env(:what_could_it_cost, :dns_cluster_query) || :ignore},
+       repos: Application.fetch_env!(:what_could_it_cost, :ecto_repos), skip: skip_migrations?()},
+      {DNSCluster,
+       query: Application.get_env(:what_could_it_cost, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: WhatCouldItCost.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: WhatCouldItCost.Finch},
+      WhatCouldItCost.CognitoTokenStrategy,
       # Start a worker by calling: WhatCouldItCost.Worker.start_link(arg)
       # {WhatCouldItCost.Worker, arg},
       # Start to serve requests, typically the last entry

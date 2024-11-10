@@ -62,7 +62,9 @@ defmodule WhatCouldItCost.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:crawly, "~> 0.17.2"},
-      {:telemetry_metrics_prometheus_core, "~> 1.2"}
+      {:telemetry_metrics_prometheus_core, "~> 1.2"},
+      {:joken, "~> 2.6.2"},
+      {:joken_jwks, "~> 1.7.0-rc.0"}
     ]
   end
 

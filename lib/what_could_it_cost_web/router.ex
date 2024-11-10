@@ -1,6 +1,7 @@
 defmodule WhatCouldItCostWeb.Router do
   use WhatCouldItCostWeb, :router
   import Phoenix.LiveView.Router
+  import WhatCouldItCostWeb.UserAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -9,6 +10,7 @@ defmodule WhatCouldItCostWeb.Router do
     plug :put_root_layout, html: {WhatCouldItCostWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
