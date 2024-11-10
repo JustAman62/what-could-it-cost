@@ -4,15 +4,17 @@ defmodule WhatCouldItCostWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <.flash_group flash={@flash} />
-    <div class="flex flex-col min-h-svh bg-yellow-300 items-center justify-center text-center px-4 my-16">
-      <h1 class="text-4xl font-bold">What Could It Cost?</h1>
+    <main class="flex flex-col min-h-svh bg-yellow-300 items-center justify-center text-center px-4 my-16">
+      <header class="flex flex-col items-center justify-center text-center">
+        <h1 class="text-4xl font-bold">What Could It Cost?</h1>
 
-      <p class="mt-16 font-semibold text-xl">
-        Remember how much you paid for that banana?
-      </p>
-      <p class="mt-6 font-semibold text-lg">
-        Play our daily quiz to see if you know how much your groceries cost.
-      </p>
+        <p class="mt-16 font-semibold text-xl">
+          Remember how much you paid for that banana?
+        </p>
+        <p class="mt-6 font-semibold text-lg">
+          Play our daily quiz to see if you know how much your groceries cost.
+        </p>
+      </header>
 
       <.form for={@form} phx-submit="start_seeded_game" class="flex flex-col items-stretch gap-2 mt-8">
         <.button phx-click="start_daily_game" class="mb-4">Play Daily</.button>
@@ -86,15 +88,18 @@ defmodule WhatCouldItCostWeb.HomeLive do
         </a>
       </div>
 
-      <div class="max-w-screen-md mt-16">
-        <h1 class="text-2xl font-bold">About</h1>
+      <section class="max-w-screen-md mt-16">
+        <h2 class="text-2xl font-bold">About</h2>
         <p class="mt-2">
           What Could It Cost? tests if you really know how much you spend on your groceries.
           With supermarket prices having changed so much in the last few years,
           it's surprisingly difficult to remember how much a bottle of coke or a banana costs these days.
         </p>
         <p class="mt-2">
-          The game shows you 5 products sourced from <a class="text-sky-600 hover:text-sky-700" href="https://www.trolley.co.uk/grocery-price-index/">trolley.co.uk</a>'s Grocery Price Index, and quizzes you on how much they cost.
+          The game shows you 5 products sourced from <a
+            class="text-sky-600 hover:text-sky-700"
+            href="https://www.trolley.co.uk/grocery-price-index/"
+          >trolley.co.uk</a>'s Grocery Price Index, and quizzes you on how much they cost.
           The closer you guess to the actual price, the higher your score.
           If you are more than £2.50 away from the price, you score 0 points.
         </p>
@@ -102,8 +107,8 @@ defmodule WhatCouldItCostWeb.HomeLive do
           Prices for products are sourced from a price index which averages prices across many UK supermarkets,
           which means they may not have the exact price you would pay at a supermarket.
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
     """
   end
 
