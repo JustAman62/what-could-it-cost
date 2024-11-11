@@ -6,14 +6,15 @@ defmodule WhatCouldItCostWeb.HomeLive do
     <.flash_group flash={@flash} />
     <main class="flex flex-col min-h-svh bg-yellow-300 items-center justify-center text-center px-4 my-16">
       <header class="flex flex-col items-center justify-center text-center">
-        <h1 class="text-4xl font-bold">What Could It Cost?</h1>
+        <img src="/images/meta-tag-500x500.png" class="w-64" alt="What Could It Cost? Logo" />
+        <%!-- <h1 class="text-4xl font-bold">What Could It Cost?</h1> --%>
 
-        <p class="mt-16 font-semibold text-xl">
-          Remember how much you paid for that banana?
-        </p>
-        <p class="mt-6 font-semibold text-lg">
+        <h1 class="mt-6 font-semibold text-xl">
           Play our daily quiz to see if you know how much your groceries cost.
-        </p>
+        </h1>
+        <h2 class="mt-6 font-semibold text-lg">
+          Do you remember how much you paid for that banana?
+        </h2>
       </header>
 
       <.form for={@form} phx-submit="start_seeded_game" class="flex flex-col items-stretch gap-2 mt-8">
