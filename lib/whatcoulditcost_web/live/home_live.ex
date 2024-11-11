@@ -99,12 +99,14 @@ defmodule WhatCouldItCostWeb.HomeLive do
           The game shows you 5 products sourced from <a
             class="text-sky-600 hover:text-sky-700"
             href="https://www.trolley.co.uk/grocery-price-index/"
-          >trolley.co.uk</a>'s Grocery Price Index, and quizzes you on how much they cost.
+          >
+          trolley.co.uk
+          </a>'s Grocery Price Index, and quizzes you on how much they cost.
           The closer you guess to the actual price, the higher your score.
           If you are more than £2.50 away from the price, you score 0 points.
         </p>
         <p class="mt-2">
-          Prices for products are sourced from a price index which averages prices across many UK supermarkets,
+          Prices for products are sourced from a price index which averages prices across 4 major UK supermarkets,
           which means they may not have the exact price you would pay at a supermarket.
         </p>
       </section>
