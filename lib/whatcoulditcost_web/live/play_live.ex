@@ -77,9 +77,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
     assigns =
       assigns
       |> assign(product_price: Decimal.parse(assigns.product["price"]) |> elem(0))
-      |> assign(
-        prev_product_price: Decimal.parse(assigns.product["prev_price"]) |> elem(0)
-      )
+      |> assign(prev_product_price: Decimal.parse(assigns.product["prev_price"]) |> elem(0))
 
     ~H"""
     <p class="font-semibold text-lg mb-2">Round <%= @index + 1 %>/5</p>
@@ -124,12 +122,18 @@ defmodule WhatCouldItCostWeb.PlayLive do
           <% :lt -> %>
             <span class="text-[0.65rem] h-4 font-semibold text-green-600 flex items-center gap-1">
               <.icon name="hero-arrow-down-right" class="h-3 w-3" />
-              £<%= Decimal.sub(@prev_product_price, @product_price) |> Decimal.to_string() %> since Oct 2023
+              <.product_change_change
+                prev_product_price={@prev_product_price}
+                product_price={@product_price}
+              />
             </span>
           <% :gt -> %>
             <span class="text-[0.65rem] h-4 font-semibold text-red-600 flex items-center gap-1">
               <.icon name="hero-arrow-up-right" class="h-3 w-3" />
-              £<%= Decimal.sub(@product_price, @prev_product_price) |> Decimal.to_string() %> since Oct 2023
+              <.product_change_change
+                prev_product_price={@product_price}
+                product_price={@prev_product_price}
+              />
             </span>
           <% _ -> %>
             <div class="h-4"></div>
@@ -252,12 +256,18 @@ defmodule WhatCouldItCostWeb.PlayLive do
         <% :lt -> %>
           <span class="text-[0.65rem] font-semibold text-green-600 flex items-center gap-1">
             <.icon name="hero-arrow-down-right" class="h-3 w-3" />
-            £<%= Decimal.sub(@prev_product_price, @product_price) |> Decimal.to_string() %> since Oct 2023
+            <.product_change_change
+              prev_product_price={@prev_product_price}
+              product_price={@product_price}
+            />
           </span>
         <% :gt -> %>
           <span class="text-[0.65rem] font-semibold text-red-600 flex items-center gap-1">
             <.icon name="hero-arrow-up-right" class="h-3 w-3" />
-            £<%= Decimal.sub(@product_price, @prev_product_price) |> Decimal.to_string() %> since Oct 2023
+            <.product_change_change
+              prev_product_price={@product_price}
+              product_price={@prev_product_price}
+            />
           </span>
         <% _ -> %>
           <span></span>
@@ -273,6 +283,29 @@ defmodule WhatCouldItCostWeb.PlayLive do
       <p class="font-semibold text-xs">Actual</p>
       <p class="font-bold text-md">£<%= Decimal.to_string(@product_price) %></p>
     </div>
+    """
+  end
+
+  attr :prev_product_price, :any, required: true
+  attr :product_price, :any, required: true
+
+  def product_change_change(assigns) do
+    ~H"""
+    <span>£</span>
+    <span>
+      <%= Decimal.sub(@prev_product_price, @product_price) |> Decimal.to_string() %>
+    </span>
+    <span>
+      (<%= Decimal.div(
+        @prev_product_price,
+        @product_price
+      )
+      |> Decimal.sub(1)
+      |> Decimal.mult(100)
+      |> Decimal.round(0)
+      |> Decimal.to_string() %>%)
+    </span>
+    <span> since Oct 2023</span>
     """
   end
 
