@@ -291,12 +291,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
   def product_change_change(assigns) do
     ~H"""
-    <span>£</span>
     <span>
-      <%= Decimal.sub(@prev_product_price, @product_price) |> Decimal.to_string() %>
-    </span>
-    <span>
-      (<%= Decimal.div(
+      £<%= Decimal.sub(@prev_product_price, @product_price) |> Decimal.to_string() %> (<%= Decimal.div(
         @prev_product_price,
         @product_price
       )
@@ -304,8 +300,8 @@ defmodule WhatCouldItCostWeb.PlayLive do
       |> Decimal.mult(100)
       |> Decimal.round(0)
       |> Decimal.to_string() %>%)
+      since Oct 2023
     </span>
-    <span> since Oct 2023</span>
     """
   end
 
@@ -422,10 +418,17 @@ defmodule WhatCouldItCostWeb.PlayLive do
       {price, ""} when price > 0 ->
         {product_price, ""} = Float.parse(socket.assigns.product["price"])
 
+        # Score is zero when you are 25% or more away, or £2.50, whatever is the highest
+        zero_score_mark = max(product_price * 0.25, 2.50)
         diff = abs(product_price - price)
-        # Score by giving max points (1000) for bang on, then remove 4 points per penny away
-        # if you are more than £2.50 away, then you get 0 points
-        round_score = round(max(0, 1000 - diff * 400))
+
+        # If your are less far away from the real price than the zero score mark, then you score that % away out of 1000 max points
+        round_score =
+          if diff < zero_score_mark do
+            round((1 - diff / zero_score_mark) * 1000)
+          else
+            0
+          end
 
         socket =
           socket
@@ -543,7 +546,7 @@ defmodule WhatCouldItCostWeb.PlayLive do
 
   defp emoji_progress_bar(score, total_score) do
     green = round(score / total_score * 5)
-    red = round((total_score - score) / total_score * 5)
+    red = 5 - green
 
     "#{String.duplicate("🟩", green)}#{String.duplicate("🟥", red)}"
   end
